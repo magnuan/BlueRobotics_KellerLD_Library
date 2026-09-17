@@ -11,9 +11,12 @@
 #define LD_SCALING3                 0x15
 #define LD_SCALING4                 0x16
 
-KellerLD::KellerLD() {
+KellerLD::KellerLD(TwoWire *twi)
+    :wire(twi ? twi : &Wire)
+{
 	fluidDensity = 1029;
 }
+
 
 void KellerLD::init() {
 	// Request memory map information
@@ -65,16 +68,16 @@ void KellerLD::setFluidDensity(float density) {
 bool KellerLD::read() {
 	uint8_t status;
 
-	Wire.beginTransmission(LD_ADDR);
-	Wire.write(LD_REQUEST);
-	Wire.endTransmission();
+	wire->beginTransmission(LD_ADDR);
+	wire->write(LD_REQUEST);
+	wire->endTransmission();
 
 	delay(9); // Max conversion time per datasheet
 
- 	Wire.requestFrom(LD_ADDR,5);
-	status = Wire.read();
-	uint16_t P_raw = (Wire.read() << 8) | Wire.read();
-	uint16_t T = (Wire.read() << 8) | Wire.read();
+ 	wire->requestFrom(LD_ADDR,5);
+	status = wire->read();
+	uint16_t P_raw = (wire->read() << 8) | wire->read();
+	uint16_t T = (wire->read() << 8) | wire->read();
 
 	// Validate the status byte (0b01BMoEXX) before trusting the data:
 	//   bit 7    reserved, must be 0
@@ -95,15 +98,15 @@ bool KellerLD::read() {
 uint16_t KellerLD::readMemoryMap(uint8_t mtp_address) {
 	uint8_t status;
 
-	Wire.beginTransmission(LD_ADDR);
-	Wire.write(mtp_address);
-	Wire.endTransmission();
+	wire->beginTransmission(LD_ADDR);
+	wire->write(mtp_address);
+	wire->endTransmission();
 
 	delay(1); // allow for response to come in
 
-	Wire.requestFrom(LD_ADDR,3);
-	status = Wire.read();
-	return ((Wire.read() << 8) | Wire.read());
+	wire->requestFrom(LD_ADDR,3);
+	status = wire->read();
+	return ((wire->read() << 8) | wire->read());
 }
 
 bool KellerLD::status() {

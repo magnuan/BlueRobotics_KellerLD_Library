@@ -36,6 +36,7 @@ THE SOFTWARE.
 #define KELLERLD_H_BLUEROBOTICS
 
 #include "Arduino.h"
+#include <Wire.h>
 
 class KellerLD {
 public:
@@ -43,7 +44,7 @@ public:
 	static constexpr float bar = 0.001f;
 	static constexpr float mbar = 1.0f;
 
-	KellerLD();
+	KellerLD(TwoWire *twi);
 
   /** Reads the onboard memory map to determine min and max pressure as 
    *  well as manufacture date, mode, and customer ID.
@@ -106,6 +107,8 @@ public:
 	float P_mode;
 	float P_min;
 	float P_max;
+protected:
+    TwoWire *wire;  
 
 private:
 	float fluidDensity;
