@@ -65,14 +65,14 @@ void KellerLD::setFluidDensity(float density) {
 	fluidDensity = density;
 }
 
-bool KellerLD::read() {
-	uint8_t status;
-
+void KellerLD::measure() {
 	wire->beginTransmission(LD_ADDR);
 	wire->write(LD_REQUEST);
 	wire->endTransmission();
+}
 
-	delay(9); // Max conversion time per datasheet
+bool KellerLD::read_measured() {
+	uint8_t status;
 
  	wire->requestFrom(LD_ADDR,5);
 	status = wire->read();
@@ -93,6 +93,12 @@ bool KellerLD::read() {
 	P_bar = (float(P)-16384)*(P_max-P_min)/32768 + P_min + P_mode;
 	T_degc = ((T>>4)-24)*0.05-50;
 	return true;
+}
+
+bool KellerLD::read() {
+    measure();
+	delay(9); // Max conversion time per datasheet
+    return read_measured();
 }
 
 uint16_t KellerLD::readMemoryMap(uint8_t mtp_address) {

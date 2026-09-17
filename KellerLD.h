@@ -55,11 +55,24 @@ public:
 	 * seawater. Should be 997 for freshwater.
 	 */
 	void setFluidDensity(float density);
-
-	/** Reads a pressure/temperature measurement from the sensor.
+    
+    /** Requests a measurement to be started from the pressure sensor
+    *   Wait more than 8ms before reading out the meaured data with read_measured()
+    */
+    void measure();
+    
+    /** Reads out a measurement started with measure()
+	 * Returns false if the sample's status is flagged as invalid, else
+	 * updates the stored pressure/temperature values and returns true.
+    */
+    bool read_measured();
+	
+    /** Reads a pressure/temperature measurement from the sensor.
 	 *
 	 * The read from I2C takes up to 40 ms, so use sparingly if possible.
 	 *
+     * Combines measure and read_measured with a 9 ms delay in between
+     *
 	 * Returns false if the sample's status is flagged as invalid, else
 	 * updates the stored pressure/temperature values and returns true.
 	 */
